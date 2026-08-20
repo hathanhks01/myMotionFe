@@ -1,8 +1,9 @@
 import axios from 'axios'
 
-// Tự động dùng VITE_API_URL từ biến môi trường Vercel (nếu có), hoặc fallback về '/api'
-const apiUrl = import.meta.env.VITE_API_URL
-const baseURL = apiUrl ? apiUrl.replace(/\/$/, '') + '/api' : '/api'
+// Ưu tiên VITE_API_URL từ biến môi trường, nếu không có thì mặc định trỏ thẳng tới Render Backend
+const defaultApiUrl = 'https://mymotionapi.onrender.com'
+const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api' : defaultApiUrl)
+const baseURL = apiUrl.startsWith('http') ? apiUrl.replace(/\/$/, '') + '/api' : apiUrl
 
 const api = axios.create({
   baseURL,
