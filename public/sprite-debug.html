@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprite Region Debugger</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      background: #1a1a2e; 
+      color: #fff; 
+      font-family: monospace; 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 { margin-bottom: 10px; color: #f8b4d9; }
+    .info { margin-bottom: 20px; color: #aaa; font-size: 14px; }
+    #mainCanvas { 
+      border: 1px solid #333; 
+      max-width: 100%; 
+      cursor: crosshair;
+    }
+    .coords { 
+      position: fixed; 
+      top: 10px; 
+      right: 10px; 
+      background: rgba(0,0,0,0.8); 
+      padding: 10px; 
+      border-radius: 8px;
+      font-size: 14px;
+      min-width: 200px;
+    }
+    #spritePreview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+    .sprite-box {
+      background: #2a2a4e;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+    }
+    .sprite-box canvas {
+      display: block;
+      margin: 0 auto 4px;
+      background: repeating-conic-gradient(#333 0% 25%, #222 0% 50%) 50% / 10px 10px;
+    }
+    .sprite-box .name {
+      font-size: 11px;
+      color: #f8b4d9;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 Sprite Region Debugger</h1>
+  <div class="info">Hover over image to see coordinates. Sprites extracted below.</div>
+  <canvas id="mainCanvas"></canvas>
+  <div class="coords" id="coords">X: 0, Y: 0</div>
+  <div id="spritePreview"></div>
+
+  <script>
+    const SPRITE_REGIONS = {
+      peace:      { x: 10,   y: 12,  w: 195, h: 240 },
+      thinking:   { x: 215,  y: 20,  w: 200, h: 230 },
+      wink:       { x: 430,  y: 12,  w: 190, h: 235 },
+      excited:    { x: 640,  y: 5,   w: 215, h: 245 },
+      thumbsUp:   { x: 870,  y: 5,   w: 195, h: 245 },
+      surprise:   { x: 1080, y: 15,  w: 180, h: 235 },
+      ohno:       { x: 1280, y: 20,  w: 240, h: 235 },
+      wave:       { x: 5,    y: 265, w: 190, h: 280 },
+      run:        { x: 205,  y: 265, w: 195, h: 280 },
+      heart:      { x: 415,  y: 275, w: 170, h: 265 },
+      loveSign:   { x: 595,  y: 268, w: 210, h: 275 },
+      like:       { x: 820,  y: 268, w: 170, h: 270 },
+      ok:         { x: 1005, y: 268, w: 155, h: 270 },
+      question:   { x: 1175, y: 268, w: 215, h: 275 },
+      phoneSit:   { x: 5,    y: 560, w: 230, h: 210 },
+      laptop:     { x: 240,  y: 555, w: 275, h: 215 },
+      lying:      { x: 530,  y: 560, w: 300, h: 200 },
+      headphone:  { x: 835,  y: 535, w: 210, h: 235 },
+      phoneNotif: { x: 1055, y: 535, w: 200, h: 240 },
+      sleep:      { x: 1275, y: 540, w: 250, h: 220 },
+      shake:      { x: 5,    y: 785, w: 180, h: 230 },
+      angry:      { x: 195,  y: 785, w: 195, h: 230 },
+      blush:      { x: 395,  y: 785, w: 230, h: 230 },
+      cry:        { x: 5,    y: 810, w: 225, h: 210 },
+      dizzy:      { x: 255,  y: 810, w: 195, h: 210 },
+      megaphone:  { x: 480,  y: 810, w: 260, h: 210 },
+      walk1:      { x: 1240, y: 790, w: 80, h: 180 },
+      walk2:      { x: 1320, y: 790, w: 80, h: 180 },
+      walk3:      { x: 1395, y: 790, w: 75, h: 180 },
+      walk4:      { x: 1460, y: 790, w: 75, h: 180 },
+    };
+
+    const img = new Image();
+    img.src = '/sprites.png';
+    img.onload = () => {
+      const mainCanvas = document.getElementById('mainCanvas');
+      const ctx = mainCanvas.getContext('2d');
+      mainCanvas.width = img.width;
+      mainCanvas.height = img.height;
+      
+      // Draw image
+      ctx.drawImage(img, 0, 0);
+      
+      // Draw region boxes
+      ctx.strokeStyle = '#00ff00';
+      ctx.lineWidth = 2;
+      ctx.font = '14px monospace';
+      ctx.fillStyle = '#00ff00';
+      for (const [name, r] of Object.entries(SPRITE_REGIONS)) {
+        ctx.strokeRect(r.x, r.y, r.w, r.h);
+        ctx.fillText(name, r.x + 2, r.y + 14);
+      }
+      
+      // Coordinate tracking
+      mainCanvas.addEventListener('mousemove', (e) => {
+        const rect = mainCanvas.getBoundingClientRect();
+        const scaleX = img.width / rect.width;
+        const scaleY = img.height / rect.height;
+        const x = Math.round((e.clientX - rect.left) * scaleX);
+        const y = Math.round((e.clientY - rect.top) * scaleY);
+        document.getElementById('coords').textContent = `X: ${x}, Y: ${y} | Image: ${img.width}x${img.height}`;
+      });
+      
+      // Extract and show sprites
+      const preview = document.getElementById('spritePreview');
+      
+      // Create processed image (remove black bg)
+      const processCanvas = document.createElement('canvas');
+      processCanvas.width = img.width;
+      processCanvas.height = img.height;
+      const processCtx = processCanvas.getContext('2d');
+      processCtx.drawImage(img, 0, 0);
+      
+      const imageData = processCtx.getImageData(0, 0, processCanvas.width, processCanvas.height);
+      const data = imageData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i] < 35 && data[i+1] < 35 && data[i+2] < 35) {
+          data[i+3] = 0;
+        } else if (data[i] < 60 && data[i+1] < 60 && data[i+2] < 60) {
+          data[i+3] = Math.max(0, Math.min(255, Math.floor(((data[i] + data[i+1] + data[i+2]) / 3 - 20) * (255 / 40))));
+        }
+      }
+      processCtx.putImageData(imageData, 0, 0);
+      
+      for (const [name, region] of Object.entries(SPRITE_REGIONS)) {
+        const box = document.createElement('div');
+        box.className = 'sprite-box';
+        
+        const spriteCanvas = document.createElement('canvas');
+        const scale = Math.min(100 / region.w, 120 / region.h, 1);
+        spriteCanvas.width = region.w * scale;
+        spriteCanvas.height = region.h * scale;
+        const spriteCtx = spriteCanvas.getContext('2d');
+        spriteCtx.drawImage(processCanvas, region.x, region.y, region.w, region.h, 0, 0, spriteCanvas.width, spriteCanvas.height);
+        
+        const label = document.createElement('div');
+        label.className = 'name';
+        label.textContent = `${name} (${region.w}x${region.h})`;
+        
+        box.appendChild(spriteCanvas);
+        box.appendChild(label);
+        preview.appendChild(box);
+      }
+    };
+  </script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { loveMessageApi } from '../services/api'
+import { useAuth } from '../contexts/AuthContext'
 import MessageCard from '../components/MessageCard'
 import ComposeModal from '../components/ComposeModal'
 
@@ -22,7 +23,18 @@ function groupByDate(messages) {
   return Object.values(groups)
 }
 
+/** Tính số ngày yêu nhau */
+function getLoveDays(matchedAtIso) {
+  if (!matchedAtIso) return 1
+  const start = new Date(matchedAtIso)
+  const now = new Date()
+  const diffTime = Math.abs(now - start)
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  return diffDays + 1
+}
+
 export default function TimelinePage() {
+  const { user } = useAuth()
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(true)
   const [showCompose, setShowCompose] = useState(false)
@@ -33,7 +45,11 @@ export default function TimelinePage() {
   const loadMessages = useCallback(async (reset = false) => {
     try {
       const currentPage = reset ? 1 : page
-      const res = await loveMessageApi.getAll({ page: currentPage, pageSize })
+      const res = await loveMessageApi.getAll({
+        userId: user?.userId,
+        page: currentPage,
+        pageSize
+      })
       const data = res.data
       if (reset) {
         setMessages(data)
@@ -48,11 +64,11 @@ export default function TimelinePage() {
     } finally {
       setLoading(false)
     }
-  }, [page])
+  }, [page, user?.userId])
 
   useEffect(() => {
     loadMessages(true)
-  }, [])
+  }, [user?.userId])
 
   const handleDelete = (id) => setMessages(prev => prev.filter(m => m.id !== id))
   const handleMarkRead = (id) => setMessages(prev =>
@@ -61,13 +77,31 @@ export default function TimelinePage() {
   const handleComposeDone = () => loadMessages(true)
 
   const groups = groupByDate(messages)
-  const totalUnread = messages.filter(m => !m.isRead).length
+  const totalUnread = messages.filter(m => !m.isRead && m.senderId !== user?.userId).length
+  const loveDays = getLoveDays(user?.matchedAt)
+
+  const partnerName = user?.partnerUsername || 'người ấy'
 
   return (
     <div className="main-content">
       <div className="page-header">
-        <h2>Những lời yêu thương 💌</h2>
-        <p>Mỗi ngày một lời nhắn từ trái tim ♡</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <h2>
+              {user?.username === 'wuy' ? 'Dành cho Khánh Linh 💗' : `Dành cho ${partnerName} 💗`}
+            </h2>
+            <p>Mỗi ngày một lời nhắn từ trái tim ♡</p>
+          </div>
+
+          {/* Love Days Counter Badge */}
+          <div className="love-counter-badge">
+            <span className="love-counter-icon">💕</span>
+            <div className="love-counter-text">
+              <span className="love-counter-days">Đã bên nhau <strong>{loveDays}</strong> ngày</span>
+              <span className="love-counter-sub">bám lấy nhau thật lâu nhé ♡</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats */}
@@ -94,7 +128,7 @@ export default function TimelinePage() {
         <div className="empty-state">
           <div className="empty-icon">💌</div>
           <h3>Chưa có lời nhắn nào</h3>
-          <p>Hãy viết lời yêu thương đầu tiên của bạn ♡</p>
+          <p>Hãy viết lời yêu thương đầu tiên gửi cho {partnerName} nhé ♡</p>
         </div>
       ) : (
         <>

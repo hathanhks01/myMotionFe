@@ -1,11 +1,13 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 const navItems = [
-  { to: '/',        icon: '💌', label: 'Lời nhắn hằng ngày' },
-  { to: '/compose', icon: '✍️', label: 'Viết lời nhắn' },
+  { to: '/', icon: '💌', label: 'Lời nhắn hàng ngày' },
 ]
 
 export default function Sidebar() {
+  const { user, logout } = useAuth()
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -28,8 +30,35 @@ export default function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <p>Gửi đến người đặc biệt của tôi 🌸</p>
-        <p style={{ marginTop: 4 }}>mỗi ngày một lời yêu</p>
+        {/* User info + partner tag */}
+        {user && (
+          <div className="sidebar-user-block">
+            <div className="sidebar-user">
+              <div className="sidebar-user-avatar">
+                {user.username === 'wuy' ? '👦' : '👧'}
+              </div>
+              <div className="sidebar-user-meta">
+                <span className="sidebar-user-name">{user.username}</span>
+                <span className="sidebar-user-code">Mã: {user.userCode}</span>
+              </div>
+              <button
+                className="sidebar-logout-btn"
+                onClick={logout}
+                title="Đăng xuất"
+              >
+                Thoát
+              </button>
+            </div>
+
+            {user.partnerUsername && (
+              <div className="sidebar-partner-pill">
+                <span>💕 Đã ghép đôi với <strong>{user.partnerUsername}</strong></span>
+              </div>
+            )}
+          </div>
+        )}
+        <p>Gửi đến Khánh Linh 🌸</p>
+        <p style={{ marginTop: 4 }}>mỗi ngày một lời yêu ♡</p>
       </div>
     </aside>
   )

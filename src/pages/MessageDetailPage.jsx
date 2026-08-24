@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { loveMessageApi } from '../services/api'
+import { useAuth } from '../contexts/AuthContext'
 
 function formatFull(iso) {
   return new Date(iso).toLocaleString('vi-VN', {
@@ -11,23 +12,25 @@ function formatFull(iso) {
 
 export default function MessageDetailPage() {
   const { id } = useParams()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [message, setMessage] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [lightbox, setLightbox] = useState(null)
+  const [lightboxItem, setLightboxItem] = useState(null)
 
   useEffect(() => {
     loveMessageApi.getById(id)
       .then(res => {
         setMessage(res.data)
-        // Tự động đánh dấu đã đọc khi mở
-        if (!res.data.isRead) {
+        // Tự động đánh dấu đã đọc khi người nhận mở
+        const isMe = user && (res.data.senderId === user.userId || res.data.senderUsername === user.username)
+        if (!res.data.isRead && !isMe) {
           loveMessageApi.markRead(id).catch(() => {})
         }
       })
       .catch(() => navigate('/'))
       .finally(() => setLoading(false))
-  }, [id])
+  }, [id, user])
 
   if (loading) return (
     <div className="main-content">
@@ -50,9 +53,15 @@ export default function MessageDetailPage() {
         <div style={{ borderBottom: '1px solid var(--pink-100)', paddingBottom: 20, marginBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
             <div>
+              <span className="card-sender-badge" style={{ marginBottom: 6, display: 'inline-block' }}>
+                {message.senderUsername === 'wuy' ? '👦 wuy' : message.senderUsername === 'klinh' ? '👧 klinh' : `💌 ${message.senderUsername || 'Người ấy'}`}
+              </span>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-light)' }}>🕐 {formatFull(message.sentAt)}</p>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
+              {!message.isPublic && (
+                <span className="badge badge-private">🔒 Riêng tư</span>
+              )}
               {message.isRead
                 ? <span className="badge badge-read">✓ Đã xem — {message.readAt ? formatFull(message.readAt) : ''}</span>
                 : <span className="badge badge-unread">💌 Chưa xem</span>
@@ -62,31 +71,54 @@ export default function MessageDetailPage() {
         </div>
 
         {/* Content */}
-        <p className="detail-content">{message.content}</p>
+        {message.content && message.content.trim() !== '' && message.content !== '💌 (Đã gửi đính kèm)' && (
+          <p className="detail-content">{message.content}</p>
+        )}
 
         {/* Attachments */}
         {message.attachments?.length > 0 && (
           <>
             <p style={{ fontSize: '0.82rem', color: 'var(--text-light)', marginTop: 24, marginBottom: 12 }}>
-              🖼 {message.attachments.length} ảnh đính kèm
+              📎 {message.attachments.length} tệp đính kèm
             </p>
             <div className="detail-attachments">
-              {message.attachments.map(att => (
-                <img
-                  key={att.id}
-                  src={att.fileUrl}
-                  alt={att.originalFileName || 'ảnh'}
-                  onClick={() => setLightbox(att.fileUrl)}
-                />
-              ))}
+              {message.attachments.map(att => {
+                const isVideo = att.fileType === 'video' || (att.fileUrl && /\.(mp4|webm|mov|mkv)$/i.test(att.fileUrl))
+                return (
+                  <div
+                    key={att.id}
+                    className="detail-attachment-item"
+                    onClick={() => setLightboxItem({ url: att.fileUrl, isVideo, title: att.originalFileName })}
+                  >
+                    {isVideo ? (
+                      <div className="attachment-video-preview">
+                        <video src={att.fileUrl} className="detail-thumb-video" muted />
+                        <span className="video-play-overlay">▶</span>
+                      </div>
+                    ) : (
+                      <img
+                        src={att.fileUrl}
+                        alt={att.originalFileName || 'ảnh'}
+                      />
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </>
         )}
       </div>
 
-      {lightbox && (
-        <div className="lightbox" onClick={() => setLightbox(null)}>
-          <img src={lightbox} alt="Xem ảnh" />
+      {lightboxItem && (
+        <div className="lightbox" onClick={() => setLightboxItem(null)}>
+          <div className="lightbox-content" onClick={e => e.stopPropagation()}>
+            <button className="lightbox-close" onClick={() => setLightboxItem(null)}>✕</button>
+            {lightboxItem.isVideo ? (
+              <video src={lightboxItem.url} controls autoPlay className="lightbox-media" />
+            ) : (
+              <img src={lightboxItem.url} alt={lightboxItem.title || 'Xem ảnh'} className="lightbox-media" />
+            )}
+          </div>
         </div>
       )}
     </div>

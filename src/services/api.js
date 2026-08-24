@@ -10,15 +10,42 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+// ── Interceptor: tự động gắn token vào header nếu đã đăng nhập ──────────────
+api.interceptors.request.use((config) => {
+  const session = localStorage.getItem('mymotion_session')
+  if (session) {
+    try {
+      const { token } = JSON.parse(session)
+      if (token) config.headers['Authorization'] = `Bearer ${token}`
+    } catch (_) {}
+  }
+  return config
+})
+
+// ── Auth & Matching ───────────────────────────────────────────────────────────
+export const authApi = {
+  /** Đăng nhập, trả về { token, userId, username, userCode, partnerId, partnerUsername, matchedAt, isMatched } */
+  login: (username, password) =>
+    api.post('/auth/login', { username, password }),
+
+  /** Kiểm tra userId còn hợp lệ không và lấy thông tin match mới nhất */
+  me: (userId) =>
+    api.get('/auth/me', { params: { userId } }),
+
+  /** Ghép đôi 2 tài khoản qua mã code */
+  match: (userId, partnerCode, matchedAt) =>
+    api.post('/auth/match', { userId, partnerCode, matchedAt }),
+}
+
 // ── Love Messages ─────────────────────────────────────────────────────────
 export const loveMessageApi = {
-  /** Lấy tất cả tin nhắn, lọc theo ngày nếu có */
+  /** Lấy tất cả tin nhắn 2 chiều, lọc theo userId và ngày nếu có */
   getAll: (params = {}) => api.get('/lovemessages', { params }),
 
   /** Lấy chi tiết 1 tin nhắn */
   getById: (id) => api.get(`/lovemessages/${id}`),
 
-  /** Gửi lời nhắn mới */
+  /** Gửi lời nhắn mới (hỗ trợ isPublic, senderId, receiverId) */
   create: (data) => api.post('/lovemessages', data),
 
   /** Cập nhật tin nhắn */

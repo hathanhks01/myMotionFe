@@ -1,0 +1,666 @@
+/* =========================================================
+   🌸 2D ANIME MASCOT INTERACTIVE SYSTEM - PREMIUM CSS 🌸
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&family=Quicksand:wght@600;700;800&display=swap');
+
+/* --- Root Mascot Container --- */
+.mascot-root {
+  position: fixed;
+  z-index: 99999;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: grab;
+  will-change: transform, left, top;
+  transition: filter 0.25s ease;
+}
+
+.mascot-root:active {
+  cursor: grabbing;
+}
+
+.mascot-root.is-dragging {
+  cursor: grabbing;
+  z-index: 100000;
+  transition: none !important;
+}
+
+/* --- Character Sprite Wrapper --- */
+.mascot-character-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 10px 18px rgba(230, 80, 140, 0.28));
+  transition: transform 0.15s ease-out;
+}
+
+.mascot-root:hover .mascot-character-box {
+  transform: scale(1.04);
+}
+
+.mascot-root.is-dragging .mascot-character-box {
+  transform: scale(1.1) rotate(6deg);
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.35));
+}
+
+/* The 2D Sprite Image */
+.mascot-img {
+  width: 135px;
+  height: 135px;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Flip direction when moving left */
+.mascot-root.face-left .mascot-img {
+  transform: scaleX(-1);
+}
+
+/* --- Natural Living Animation States --- */
+
+/* 1. Gentle Idle Breathing & Sway */
+.mascot-root.anim-idle .mascot-character-box {
+  animation: mascotBreathe 3.4s ease-in-out infinite;
+}
+
+@keyframes mascotBreathe {
+  0%, 100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  35% {
+    transform: translateY(-6px) scale(1.02, 0.98) rotate(1deg);
+  }
+  70% {
+    transform: translateY(-2px) scale(0.99, 1.01) rotate(-1deg);
+  }
+}
+
+/* 2. Walk Cycle Animation */
+.mascot-root.anim-walk .mascot-character-box {
+  animation: mascotWalkBob 0.38s ease-in-out infinite alternate;
+}
+
+@keyframes mascotWalkBob {
+  0% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  100% {
+    transform: translateY(-8px) rotate(3deg);
+  }
+}
+
+/* 3. Run Sprint Animation */
+.mascot-root.anim-run .mascot-character-box {
+  animation: mascotRunSprint 0.24s ease-in-out infinite alternate;
+}
+
+@keyframes mascotRunSprint {
+  0% {
+    transform: translateY(0) rotate(-5deg) scale(1.05, 0.95);
+  }
+  100% {
+    transform: translateY(-12px) rotate(6deg) scale(0.95, 1.05);
+  }
+}
+
+/* 4. Sleep Float Animation */
+.mascot-root.anim-sleep .mascot-character-box {
+  animation: mascotSleepFloat 4s ease-in-out infinite;
+}
+
+@keyframes mascotSleepFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.03, 0.97);
+  }
+}
+
+/* 5. Love Pulse / Heart Animation */
+.mascot-root.anim-love .mascot-character-box {
+  animation: mascotLoveHeart 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2;
+}
+
+@keyframes mascotLoveHeart {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.18) rotate(3deg);
+  }
+}
+
+/* 6. Cheer Jump Animation */
+.mascot-root.anim-cheer .mascot-character-box {
+  animation: mascotCheerJump 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) 3;
+}
+
+@keyframes mascotCheerJump {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-16px) scale(1.12, 0.92);
+  }
+}
+
+/* 7. Landing Squash & Bounce (Gravity Hit) */
+.mascot-root.anim-land .mascot-character-box {
+  animation: mascotLandSquash 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes mascotLandSquash {
+  0% {
+    transform: translateY(0) scale(1.25, 0.75);
+  }
+  40% {
+    transform: translateY(-10px) scale(0.9, 1.15);
+  }
+  75% {
+    transform: translateY(-2px) scale(1.05, 0.96);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- Cute Ground Shadow & Aura --- */
+.mascot-ground-shadow {
+  position: absolute;
+  bottom: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 75px;
+  height: 12px;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.28) 0%, rgba(240, 100, 160, 0.15) 40%, transparent 75%);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.mascot-root.is-dragging .mascot-ground-shadow,
+.mascot-root.is-airborne .mascot-ground-shadow {
+  opacity: 0.15;
+  width: 45px;
+  height: 6px;
+  transform: translateX(-50%) translateY(40px);
+}
+
+/* --- Speech Bubble with Typewriter & Glassmorphism --- */
+.mascot-dialogue-bubble {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 245, 250, 0.98) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid rgba(255, 180, 210, 0.9);
+  border-radius: 20px;
+  padding: 10px 16px;
+  min-width: 140px;
+  max-width: 260px;
+  box-shadow: 
+    0 12px 30px rgba(220, 70, 130, 0.2),
+    0 4px 10px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 #ffffff;
+  font-family: 'Quicksand', 'Comfortaa', sans-serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #4a2838;
+  text-align: center;
+  z-index: 100005;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mascot-dialogue-bubble.show {
+  transform: translateX(-50%) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Bubble Tail Arrow */
+.mascot-dialogue-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 9px 8px 0 8px;
+  border-style: solid;
+  border-color: rgba(255, 180, 210, 0.9) transparent transparent transparent;
+}
+
+.mascot-dialogue-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 7px 6px 0 6px;
+  border-style: solid;
+  border-color: #fff5fa transparent transparent transparent;
+  z-index: 1;
+}
+
+/* Cute Emoji in Bubble */
+.mascot-bubble-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #e84393;
+  margin-bottom: 3px;
+  font-weight: 800;
+}
+
+/* --- Floating ZZZ Particles for Sleeping --- */
+.mascot-zzz-box {
+  position: absolute;
+  top: -15px;
+  right: -5px;
+  font-family: 'Comfortaa', cursive;
+  font-weight: 800;
+  color: #a29bfe;
+  pointer-events: none;
+}
+
+.mascot-zzz-box span {
+  position: absolute;
+  animation: mascotZzzFloat 2.2s ease-in-out infinite;
+}
+
+.mascot-zzz-box span:nth-child(1) { font-size: 11px; left: 0; animation-delay: 0s; }
+.mascot-zzz-box span:nth-child(2) { font-size: 14px; left: 10px; animation-delay: 0.7s; }
+.mascot-zzz-box span:nth-child(3) { font-size: 18px; left: 22px; animation-delay: 1.4s; }
+
+@keyframes mascotZzzFloat {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  40% { opacity: 0.9; }
+  100% { transform: translate(18px, -28px) scale(1.2); opacity: 0; }
+}
+
+/* --- Particles Shower (Hearts, Stars, Notes) --- */
+.mascot-particle-item {
+  position: fixed;
+  pointer-events: none;
+  font-size: 20px;
+  z-index: 100010;
+  animation: mascotParticleFly 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes mascotParticleFly {
+  0% {
+    transform: translate(0, 0) scale(0.4) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(var(--dx, 20px), -45px) scale(1.3) rotate(var(--rot, 20deg));
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--dx, 20px) * 1.5), -90px) scale(0.2) rotate(calc(var(--rot, 20deg) * 2));
+    opacity: 0;
+  }
+}
+
+/* --- Quick Interactive Context & Action Menu --- */
+.mascot-quick-menu {
+  position: fixed;
+  z-index: 100015;
+  background: rgba(28, 20, 36, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  padding: 8px;
+  min-width: 210px;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.45),
+    0 4px 16px rgba(230, 80, 140, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  font-family: 'Quicksand', sans-serif;
+  opacity: 0;
+  transform: scale(0.85) translateY(10px);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: none;
+}
+
+.mascot-quick-menu.open {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+
+.mascot-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 6px;
+}
+
+.mascot-menu-header span {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ff9ff3;
+  letter-spacing: 0.3px;
+}
+
+.mascot-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: #f1f2f6;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.mascot-menu-btn:hover {
+  background: rgba(255, 107, 129, 0.2);
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+.mascot-menu-btn.active {
+  background: linear-gradient(135deg, rgba(232, 67, 147, 0.35), rgba(253, 121, 168, 0.2));
+  color: #ff7675;
+}
+
+.mascot-menu-btn .btn-emoji {
+  font-size: 16px;
+  width: 22px;
+  text-align: center;
+}
+
+.mascot-menu-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 5px 6px;
+}
+
+/* --- Floating Mini Controls Bar (Above Mascot on Hover) --- */
+.mascot-hover-bar {
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(25, 20, 32, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 3px 6px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 100004;
+}
+
+.mascot-root:hover .mascot-hover-bar,
+.mascot-hover-bar:hover {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.mascot-bar-icon-btn {
+  background: transparent;
+  border: none;
+  color: #dfe6e9;
+  font-size: 13px;
+  padding: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.mascot-bar-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  transform: scale(1.15);
+}
+
+/* --- STICKER GALLERY MODAL (33 Emotes Library) --- */
+.mascot-gallery-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 16, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: mascotFadeIn 0.25s ease-out;
+}
+
+@keyframes mascotFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mascot-gallery-modal {
+  background: linear-gradient(135deg, #1f1828 0%, #151020 100%);
+  border: 1px solid rgba(255, 150, 200, 0.25);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 
+    0 30px 80px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(232, 67, 147, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  font-family: 'Quicksand', sans-serif;
+  animation: mascotModalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes mascotModalPop {
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.mascot-gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mascot-gallery-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mascot-gallery-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #ff9ff3, #feca57);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.mascot-gallery-close {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #aaa;
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.mascot-gallery-close:hover {
+  background: rgba(235, 77, 75, 0.8);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+/* Category Filter Tabs */
+.mascot-gallery-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 12px 24px;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mascot-tab-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid transparent;
+  color: #c8d6e5;
+  padding: 6px 14px;
+  border-radius: 14px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.mascot-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.mascot-tab-btn.active {
+  background: linear-gradient(135deg, #e84393, #fd79a8);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(232, 67, 147, 0.4);
+}
+
+/* Grid of Stickers */
+.mascot-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.mascot-gallery-item {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mascot-gallery-item:hover {
+  background: rgba(232, 67, 147, 0.15);
+  border-color: rgba(255, 150, 200, 0.4);
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.mascot-gallery-item.is-selected {
+  background: rgba(232, 67, 147, 0.25);
+  border-color: #ff7675;
+  box-shadow: 0 0 16px rgba(255, 118, 117, 0.4);
+}
+
+.mascot-gallery-thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  margin-bottom: 6px;
+}
+
+.mascot-gallery-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #dfe6e9;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* --- Floating Minimized Bubble --- */
+.mascot-minimized-bubble {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%);
+  border: 3px solid #ffffff;
+  box-shadow: 
+    0 10px 25px rgba(255, 154, 158, 0.45),
+    0 0 0 4px rgba(255, 154, 158, 0.2);
+  cursor: pointer;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: mascotMinPulse 3s ease-in-out infinite;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mascot-minimized-bubble:hover {
+  transform: scale(1.15) rotate(10deg);
+  box-shadow: 0 15px 35px rgba(255, 154, 158, 0.6);
+}
+
+.mascot-min-avatar {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+@keyframes mascotMinPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
