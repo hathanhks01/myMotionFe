@@ -9,13 +9,29 @@ function formatTime(iso) {
   return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
 }
 
-export default function MessageCard({ message, onDelete, onMarkRead }) {
+export default function MessageCard({ message, onDelete, onMarkRead, onTogglePrivacy }) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [lightboxItem, setLightboxItem] = useState(null)
   const [deleting, setDeleting] = useState(false)
+  const [togglingPrivacy, setTogglingPrivacy] = useState(false)
 
   const isMe = user && (message.senderId === user.userId || message.senderUsername === user.username)
+
+  const handleTogglePrivacy = async (e) => {
+    e.stopPropagation()
+    if (togglingPrivacy) return
+    setTogglingPrivacy(true)
+    const newIsPublic = !message.isPublic
+    try {
+      await loveMessageApi.togglePrivacy(message.id, newIsPublic)
+      if (onTogglePrivacy) onTogglePrivacy(message.id, newIsPublic)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setTogglingPrivacy(false)
+    }
+  }
 
   const handleMarkRead = async (e) => {
     e.stopPropagation()
@@ -59,11 +75,25 @@ export default function MessageCard({ message, onDelete, onMarkRead }) {
           </div>
 
           <div className="card-badges">
-            {!message.isPublic && (
-              <span className="badge badge-private" title="Chỉ người viết xem được">
-                🔒 Riêng tư
-              </span>
+            {/* Trạng thái Công khai / Riêng tư (Người gửi có thể bấm vào để đổi nhanh) */}
+            {isMe ? (
+              <button
+                type="button"
+                className={`badge badge-interactive ${message.isPublic ? 'badge-public' : 'badge-private'}`}
+                onClick={handleTogglePrivacy}
+                disabled={togglingPrivacy}
+                title={message.isPublic ? 'Đang công khai. Bấm để chuyển sang Riêng tư' : 'Đang riêng tư. Bấm để chuyển sang Công khai'}
+              >
+                {togglingPrivacy ? '⏳' : message.isPublic ? '🔓 Công khai' : '🔒 Riêng tư'}
+              </button>
+            ) : (
+              !message.isPublic && (
+                <span className="badge badge-private" title="Chỉ người viết xem được">
+                  🔒 Riêng tư
+                </span>
+              )
             )}
+
             {message.isRead
               ? <span className="badge badge-read">✓ Đã xem</span>
               : <span className="badge badge-unread">💌 Chưa xem</span>
@@ -132,13 +162,23 @@ export default function MessageCard({ message, onDelete, onMarkRead }) {
             </button>
           )}
           {isMe && (
-            <button
-              className="btn-action danger"
-              onClick={handleDelete}
-              disabled={deleting}
-            >
-              🗑 {deleting ? '...' : 'Xóa'}
-            </button>
+            <>
+              <button
+                className="btn-action"
+                onClick={handleTogglePrivacy}
+                disabled={togglingPrivacy}
+                title={message.isPublic ? 'Chuyển sang chỉ mình bạn xem được' : 'Chuyển sang để đối phương cùng xem'}
+              >
+                {togglingPrivacy ? '⏳ Đang đổi...' : message.isPublic ? '🔒 Đặt riêng tư' : '🔓 Đặt công khai'}
+              </button>
+              <button
+                className="btn-action danger"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                🗑 {deleting ? '...' : 'Xóa'}
+              </button>
+            </>
           )}
         </div>
       </div>

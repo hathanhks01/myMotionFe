@@ -46,6 +46,30 @@ export function AuthProvider({ children }) {
       token: data.token,
       userId: data.userId,
       username: data.username,
+      fullName: data.fullName,
+      birthDate: data.birthDate,
+      phoneNumber: data.phoneNumber,
+      userCode: data.userCode,
+      partnerId: data.partnerId,
+      partnerUsername: data.partnerUsername,
+      matchedAt: data.matchedAt,
+      isMatched: !!data.partnerId,
+    }
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session))
+    setUser(session)
+    return session
+  }, [])
+
+  // ── Đăng ký ──────────────────────────────────────────────────────────────
+  const register = useCallback(async (formData) => {
+    const { data } = await authApi.register(formData)
+    const session = {
+      token: data.token,
+      userId: data.userId,
+      username: data.username,
+      fullName: data.fullName,
+      birthDate: data.birthDate,
+      phoneNumber: data.phoneNumber,
       userCode: data.userCode,
       partnerId: data.partnerId,
       partnerUsername: data.partnerUsername,
@@ -84,6 +108,7 @@ export function AuthProvider({ children }) {
       user,
       loading,
       login,
+      register,
       logout,
       matchPartner,
       isAuthenticated: !!user,

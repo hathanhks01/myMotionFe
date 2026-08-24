@@ -272,6 +272,35 @@ body::before {
   background: rgba(194,118,138,0.12);
   color: var(--rose);
 }
+.badge-public {
+  background: rgba(168, 230, 207, 0.4);
+  color: #2b7a5a;
+  border: 1px solid rgba(168, 230, 207, 0.8);
+}
+.badge-private {
+  background: rgba(255, 170, 165, 0.35);
+  color: #b54a5a;
+  border: 1px solid rgba(255, 170, 165, 0.8);
+}
+.badge-interactive {
+  border: none;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.badge-interactive:hover {
+  transform: scale(1.08);
+  filter: brightness(0.96);
+  box-shadow: 0 2px 8px rgba(194, 118, 138, 0.2);
+}
+.badge-interactive:active {
+  transform: scale(0.96);
+}
 
 .card-content {
   font-size: 0.97rem;

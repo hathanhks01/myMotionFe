@@ -57,8 +57,6 @@ export default function Sidebar() {
             )}
           </div>
         )}
-        <p>Gửi đến Khánh Linh 🌸</p>
-        <p style={{ marginTop: 4 }}>mỗi ngày một lời yêu ♡</p>
       </div>
     </aside>
   )

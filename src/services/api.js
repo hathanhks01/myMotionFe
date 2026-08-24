@@ -24,9 +24,13 @@ api.interceptors.request.use((config) => {
 
 // ── Auth & Matching ───────────────────────────────────────────────────────────
 export const authApi = {
-  /** Đăng nhập, trả về { token, userId, username, userCode, partnerId, partnerUsername, matchedAt, isMatched } */
+  /** Đăng nhập, trả về { token, userId, username, fullName, birthDate, phoneNumber, userCode, partnerId, partnerUsername, matchedAt, isMatched } */
   login: (username, password) =>
     api.post('/auth/login', { username, password }),
+
+  /** Đăng ký tài khoản mới (họ tên, ngày sinh, SĐT) */
+  register: (data) =>
+    api.post('/auth/register', data),
 
   /** Kiểm tra userId còn hợp lệ không và lấy thông tin match mới nhất */
   me: (userId) =>
@@ -50,6 +54,10 @@ export const loveMessageApi = {
 
   /** Cập nhật tin nhắn */
   update: (id, data) => api.put(`/lovemessages/${id}`, data),
+
+  /** Đổi trạng thái Công khai / Riêng tư */
+  togglePrivacy: (id, isPublic) =>
+    api.patch(`/lovemessages/${id}/privacy`, { isPublic }),
 
   /** Đánh dấu đã đọc */
   markRead: (id) => api.patch(`/lovemessages/${id}/read`),

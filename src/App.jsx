@@ -6,6 +6,7 @@ import TimelinePage from './pages/TimelinePage'
 import ComposePage from './pages/ComposePage'
 import MessageDetailPage from './pages/MessageDetailPage'
 import LoginPage from './pages/LoginPage'
+import SecretRegisterPage from './pages/SecretRegisterPage'
 import Mascot from './components/Mascot'
 import BackgroundMusic from './components/BackgroundMusic'
 
@@ -22,6 +23,16 @@ function AppLayout() {
             !loading && isAuthenticated
               ? <Navigate to="/" replace />
               : <LoginPage />
+          }
+        />
+
+        {/* Trang đăng ký ẩn (chỉ ai có link trực tiếp mới vào được) */}
+        <Route
+          path="/secret-register"
+          element={
+            !loading && isAuthenticated
+              ? <Navigate to="/" replace />
+              : <SecretRegisterPage />
           }
         />
 

@@ -74,6 +74,9 @@ export default function TimelinePage() {
   const handleMarkRead = (id) => setMessages(prev =>
     prev.map(m => m.id === id ? { ...m, isRead: true, readAt: new Date().toISOString() } : m)
   )
+  const handleTogglePrivacy = (id, newIsPublic) => setMessages(prev =>
+    prev.map(m => m.id === id ? { ...m, isPublic: newIsPublic } : m)
+  )
   const handleComposeDone = () => loadMessages(true)
 
   const groups = groupByDate(messages)
@@ -90,7 +93,6 @@ export default function TimelinePage() {
             <h2>
               {user?.username === 'wuy' ? 'Dành cho Khánh Linh 💗' : `Dành cho ${partnerName} 💗`}
             </h2>
-            <p>Mỗi ngày một lời nhắn từ trái tim ♡</p>
           </div>
 
           {/* Love Days Counter Badge */}
@@ -143,6 +145,7 @@ export default function TimelinePage() {
                   message={msg}
                   onDelete={handleDelete}
                   onMarkRead={handleMarkRead}
+                  onTogglePrivacy={handleTogglePrivacy}
                 />
               ))}
             </div>

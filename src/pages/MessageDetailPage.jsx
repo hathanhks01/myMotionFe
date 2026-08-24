@@ -42,6 +42,23 @@ export default function MessageDetailPage() {
 
   if (!message) return null
 
+  const isMe = user && message && (message.senderId === user.userId || message.senderUsername === user.username)
+  const [togglingPrivacy, setTogglingPrivacy] = useState(false)
+
+  const handleTogglePrivacy = async () => {
+    if (togglingPrivacy || !message) return
+    setTogglingPrivacy(true)
+    const newIsPublic = !message.isPublic
+    try {
+      await loveMessageApi.togglePrivacy(message.id, newIsPublic)
+      setMessage(prev => ({ ...prev, isPublic: newIsPublic }))
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setTogglingPrivacy(false)
+    }
+  }
+
   return (
     <div className="main-content">
       <button className="detail-back" onClick={() => navigate(-1)}>
@@ -58,9 +75,21 @@ export default function MessageDetailPage() {
               </span>
               <p style={{ fontSize: '0.82rem', color: 'var(--text-light)' }}>🕐 {formatFull(message.sentAt)}</p>
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {!message.isPublic && (
-                <span className="badge badge-private">🔒 Riêng tư</span>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              {isMe ? (
+                <button
+                  type="button"
+                  className={`badge badge-interactive ${message.isPublic ? 'badge-public' : 'badge-private'}`}
+                  onClick={handleTogglePrivacy}
+                  disabled={togglingPrivacy}
+                  title={message.isPublic ? 'Đang công khai. Bấm để chuyển sang Riêng tư' : 'Đang riêng tư. Bấm để chuyển sang Công khai'}
+                >
+                  {togglingPrivacy ? '⏳' : message.isPublic ? '🔓 Công khai' : '🔒 Riêng tư'}
+                </button>
+              ) : (
+                !message.isPublic && (
+                  <span className="badge badge-private">🔒 Riêng tư</span>
+                )
               )}
               {message.isRead
                 ? <span className="badge badge-read">✓ Đã xem — {message.readAt ? formatFull(message.readAt) : ''}</span>
