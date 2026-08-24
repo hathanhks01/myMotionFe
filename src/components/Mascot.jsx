@@ -8,8 +8,9 @@ const MASCOT_HEIGHT = 135;
 
 export default function Mascot() {
   // --- Position & Movement State ---
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
   const [pos, setPos] = useState({
-    x: typeof window !== 'undefined' ? 280 : 280,
+    x: isMobile ? 10 : 280,  // mobile: left edge; desktop: after sidebar
     y: typeof window !== 'undefined' ? window.innerHeight - 150 : 500,
   });
   const [facingLeft, setFacingLeft] = useState(false);

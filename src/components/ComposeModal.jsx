@@ -115,12 +115,22 @@ export default function ComposeModal({ onClose, onSuccess }) {
             {previews.map((item, idx) => (
               <div key={idx} className="compose-preview-item">
                 {item.isVideo ? (
-                  <video src={item.url} className="compose-preview-media" muted />
+                  <div className="compose-video-thumb">
+                    <video
+                      src={item.url}
+                      className="compose-preview-media"
+                      muted
+                      playsInline
+                      preload="metadata"
+                      onLoadedMetadata={e => { e.target.currentTime = 0.5 }}
+                    />
+                    <span className="compose-video-icon">▶</span>
+                  </div>
                 ) : (
                   <img src={item.url} alt={item.name} className="compose-preview-media" />
                 )}
                 <span className="compose-preview-badge">
-                  {item.isVideo ? '🎥 Video' : '🖼️ Ảnh'}
+                  {item.isVideo ? '🎥' : '🖼️'}
                 </span>
                 {!sending && (
                   <button
@@ -136,6 +146,7 @@ export default function ComposeModal({ onClose, onSuccess }) {
             ))}
           </div>
         )}
+
 
         {/* Attachment & Public/Private Controls */}
         <div className="compose-media-toolbar">
