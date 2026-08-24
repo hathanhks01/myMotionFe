@@ -339,29 +339,20 @@ export const MASCOT_STICKERS = [
   },
 ];
 
-// Walk animation frame lists (smooth 9-frame cycle)
+// Walk animation frame lists
 export const WALK_FRAMES = [
-  '/sprites/run_01.png',
-  '/sprites/run_02.png',
-  '/sprites/run_03.png',
-  '/sprites/run_04.png',
-  '/sprites/run_05.png',
-  '/sprites/run_06.png',
-  '/sprites/run_07.png',
-  '/sprites/run_08.png',
-  '/sprites/run_09.png',
+  '/sprites/25_walk_01.png',
+  '/sprites/26_walk_02.png',
+  '/sprites/27_walk_03.png',
+  '/sprites/28_walk_04.png',
 ];
 
 export const RUN_FRAMES = [
-  '/sprites/run_01.png',
-  '/sprites/run_02.png',
-  '/sprites/run_03.png',
-  '/sprites/run_04.png',
-  '/sprites/run_05.png',
-  '/sprites/run_06.png',
-  '/sprites/run_07.png',
-  '/sprites/run_08.png',
-  '/sprites/run_09.png',
+  '/sprites/29_run_01.png',
+  '/sprites/30_run_02.png',
+  '/sprites/31_run_03.png',
+  '/sprites/32_run_04.png',
+  '/sprites/33_run_05.png',
 ];
 
 // Spontaneous idle actions sequence when the user leaves the character alone
