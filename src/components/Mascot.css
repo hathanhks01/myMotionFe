@@ -664,3 +664,29 @@
     transform: scale(1.08);
   }
 }
+
+/* --- Mobile Responsiveness for Mascot --- */
+@media (max-width: 768px) {
+  .mascot-img {
+    width: 96px;
+    height: 96px;
+  }
+
+  .mascot-speech-bubble {
+    max-width: 200px;
+    padding: 9px 12px;
+    font-size: 0.76rem;
+  }
+
+  .mascot-menu-card {
+    width: 200px;
+    padding: 10px;
+  }
+
+  .mascot-gallery-modal {
+    width: 92vw;
+    max-height: 80vh;
+    padding: 16px;
+  }
+}
+
