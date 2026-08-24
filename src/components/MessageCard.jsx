@@ -94,22 +94,29 @@ export default function MessageCard({ message, onDelete, onMarkRead }) {
               return (
                 <div
                   key={att.id}
-                  className="attachment-thumb-wrap"
+                  className={`attachment-thumb-wrap ${isVideo ? 'is-video' : ''}`}
                   onClick={e => {
                     e.stopPropagation()
                     setLightboxItem({ url: att.fileUrl, isVideo, title: att.originalFileName })
                   }}
                 >
                   {isVideo ? (
-                    <div className="attachment-video-preview">
-                      <video src={att.fileUrl} className="attachment-thumb" muted />
+                    <>
+                      <video
+                        src={att.fileUrl}
+                        className="attachment-thumb-media"
+                        muted
+                        playsInline
+                        preload="metadata"
+                        onLoadedMetadata={e => { e.target.currentTime = 0.5 }}
+                      />
                       <span className="video-play-overlay">▶</span>
-                    </div>
+                    </>
                   ) : (
                     <img
                       src={att.fileUrl}
                       alt={att.originalFileName || 'ảnh'}
-                      className="attachment-thumb"
+                      className="attachment-thumb-media"
                     />
                   )}
                 </div>

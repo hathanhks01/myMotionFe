@@ -87,18 +87,26 @@ export default function MessageDetailPage() {
                 return (
                   <div
                     key={att.id}
-                    className="detail-attachment-item"
+                    className={`detail-attachment-item ${isVideo ? 'is-video' : ''}`}
                     onClick={() => setLightboxItem({ url: att.fileUrl, isVideo, title: att.originalFileName })}
                   >
                     {isVideo ? (
-                      <div className="attachment-video-preview">
-                        <video src={att.fileUrl} className="detail-thumb-video" muted />
+                      <>
+                        <video
+                          src={att.fileUrl}
+                          className="detail-attachment-media"
+                          muted
+                          playsInline
+                          preload="metadata"
+                          onLoadedMetadata={e => { e.target.currentTime = 0.5 }}
+                        />
                         <span className="video-play-overlay">▶</span>
-                      </div>
+                      </>
                     ) : (
                       <img
                         src={att.fileUrl}
                         alt={att.originalFileName || 'ảnh'}
+                        className="detail-attachment-media"
                       />
                     )}
                   </div>
