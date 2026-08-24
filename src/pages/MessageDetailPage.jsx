@@ -17,6 +17,7 @@ export default function MessageDetailPage() {
   const [message, setMessage] = useState(null)
   const [loading, setLoading] = useState(true)
   const [lightboxItem, setLightboxItem] = useState(null)
+  const [togglingPrivacy, setTogglingPrivacy] = useState(false)
 
   useEffect(() => {
     loveMessageApi.getById(id)
@@ -43,7 +44,6 @@ export default function MessageDetailPage() {
   if (!message) return null
 
   const isMe = user && message && (message.senderId === user.userId || message.senderUsername === user.username)
-  const [togglingPrivacy, setTogglingPrivacy] = useState(false)
 
   const handleTogglePrivacy = async () => {
     if (togglingPrivacy || !message) return
